@@ -12,22 +12,17 @@ class machine:
         ])
 
         self.model.compile(optimizer='adam', loss='binary_crossentropy')
-        self.randomFit(.2,10)
     
-    def randomFit(self, scale=.2, max=10.0):
+    def randomFit(self, scale=.2, max_value=10.0):
         for layer in self.model.layers:
-            if hasattr(layer, 'weights'):
-                weights = layer.get_weights()
-                for i, w in enumerate(weights):
-                    r = (np.random.random(w.shape) * scale * 2) - scale
-                    weights[i] = tf.where(tf.less(w + r, -max), -max, tf.where(tf.greater(w + r, max), max, w + r))
-                layer.set_weights(weights)
-            if hasattr(layer, 'biases'):
-                biases = layer.get_weights()
-                for i, b in enumerate(biases):
-                    r = (np.random.random(b.shape) * scale * 2) - scale
-                    biases[i] = tf.where(tf.less(b + r, -max), -max, tf.where(tf.greater(b + r, max), max, b + r))
-                layer.set_weights(biases)
+            current_weights = layer.get_weights()
+            new_weights = []
+            for w in current_weights:  # This will loop over weights and biases together
+                r = (np.random.random(w.shape) * scale * 2) - scale
+                # Apply the randomness
+                modified_w = np.clip(w + r, -max_value, max_value)
+                new_weights.append(modified_w)
+            layer.set_weights(new_weights)
 
     def runModel(self, game_tiles):
         inputData = []
@@ -46,31 +41,3 @@ class machine:
                 maxIndex = i
         
         return maxIndex
-
-    checkPoint = 0
-    bestScore = 0
-    def evalModel(self, fitNess):
-        global checkPoint, bestScore
-
-        if (fitNess > bestScore):
-            print("Saving...")
-            bestScore = fitNess
-            self.model.save_weights("model.h5")
-        else:
-            checkPoint += 1
-
-        fitNess = 0
-
-        if checkPoint > 3:
-            print("Loading...")
-            checkPoint = 0
-            self.model.load_weights("C:/PythonSaves/Emulator/model.h5")
-
-        self.randomFit(self.model)
-
-        #for i in range(50):
-        #    print(bestScore)
-        #    emulation.send_input(pyboy.WindowEvent.RELEASE_BUTTON_A)
-        #    emulation.tick()
-        #    emulation.send_input(pyboy.WindowEvent.PRESS_BUTTON_A)
-        #    emulation.tick()

@@ -3,7 +3,7 @@ from machine import machine
 from gameboy import game
 from time import time
 
-amount_of_games = 9
+amount_of_games = 1
 games = []
 models = []
 game_over = []
@@ -11,8 +11,10 @@ game_over = []
 for i in range(amount_of_games):
     game_over.append(0)
     newModel = machine()
-    if amount_of_games == 0:
-        newModel.model = newModel.model.load_weights("C:/PythonSaves/Emulator/model.h5")
+    if i == 0:
+        newModel.model.load_weights("C:/PythonSaves/Emulator/model.h5")
+    else:
+        newModel.randomFit(.2, 10)
     models.append(newModel)
     newGame = game()
     newGame.emulation.tick()
@@ -32,14 +34,14 @@ while 1:
             if game_over[i] == 0:
                 game_over[i] = 1
                 reset += 1
-        games[i].updateData()
-        button = -1
-        if clock >= 100:
-            button = models[i].runModel(games[i].game_tiles)
-            if i == amount_of_games-1:
-                clock = 0
         if (game_over[i] == 0):
-            games[i].runModel(button)
+            games[i].updateData()
+            button = -1
+            if clock >= 100:
+                button = models[i].runModel(games[i].game_tiles)
+                if i == amount_of_games-1:
+                    clock = 0
+            games[i].runGame(button)
     if (reset == amount_of_games):
         maxIndex = 0
         reset = 0
@@ -62,12 +64,13 @@ while 1:
         
         print("Max index for that generation: " + str(games[maxIndex].fitNess))
 
-        models[maxIndex].model.save_weights("model.h5")
+        models[maxIndex].model.save_weights("C:/PythonSaves/Emulator/model.h5")
         for i in range(amount_of_games):
             games[i].fitNess = 0
 
             if i == maxIndex:
                 continue
+                
             models[i].model.set_weights(models[maxIndex].model.get_weights())
             models[i].randomFit(.1,10.0)
         for i in range(amount_of_games):

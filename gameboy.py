@@ -27,7 +27,7 @@ class game:
             for x in range(2,12):
                 if (self.tile[x,y] == 303):
                     self.game_tiles[y][x-2] = 0
-                else:
+                elif (self.tile[x,y] != 135):
                     self.game_tiles[y][x-2] = 1
 
         #Sprites
@@ -45,7 +45,7 @@ class game:
             if x >= 0 and y >= 0 and x < 10 and y < 18:
                 self.game_tiles[y][x] = 2
             
-    def runModel(self, move):
+    def runGame(self, move):
         if self.tile[0,0] == 298 and move != -1:
             x = 0
 

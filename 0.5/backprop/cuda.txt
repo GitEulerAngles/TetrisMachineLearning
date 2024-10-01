@@ -1,0 +1,5 @@
+Is built with CUDA: True
+Available devices:
+PhysicalDevice(name='/physical_device:CPU:0', device_type='CPU')
+PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')
+GPU devices:[PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]
